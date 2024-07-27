@@ -1,5 +1,6 @@
 import { createServerClient } from '@supabase/ssr'
 import { type NextRequest, NextResponse } from 'next/server'
+import { PRIVATE_ROUTES } from '@repo/constants'
 import { env } from '@repo/environment'
 
 export async function updateSession(request: NextRequest) {
@@ -38,14 +39,16 @@ export async function updateSession(request: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser()
 
-  if (
-    !user &&
-    !request.nextUrl.pathname.startsWith('/login') &&
-    !request.nextUrl.pathname.startsWith('/auth')
-  ) {
+  const IS_USER = !!user
+  const IS_PRIVATE = Object.values(PRIVATE_ROUTES).some((r) =>
+    request.nextUrl.pathname.startsWith(r)
+  )
+
+  if (!IS_USER && IS_PRIVATE) {
     // no user, potentially respond by redirecting the user to the login page
     const url = request.nextUrl.clone()
     url.pathname = '/login'
+
     return NextResponse.redirect(url)
   }
 
