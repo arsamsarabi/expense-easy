@@ -5,5 +5,5 @@ export default function Home() {
     <main className="bg-indigo-400">
       <HelloWorld />
     </main>
-  );
+  )
 }
